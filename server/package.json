@@ -1,19 +1,20 @@
 {
-  "name": "tesatopgun_include_server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "server",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./bin/www"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tanakorn0314/TGR2019_include.git"
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.0"
   },
-  "author": "kittinan chanpreecha",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/tanakorn0314/TGR2019_include/issues"
-  },
-  "homepage": "https://github.com/tanakorn0314/TGR2019_include#readme"
+  "devDependencies": {
+    "nodemon": "^1.18.9"
+  }
 }
