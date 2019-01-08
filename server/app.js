@@ -36,6 +36,41 @@ app.post('/addUser', function (req, res) {
   });
 })
 
+app.post('/addMultiUser', function (req, res) {
+  // First read existing users.
+  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
+     data = JSON.parse( data );
+      var newUsers = req.body
+     for(i in newUsers) {
+      newUsers[i] = {
+        "name": req.body[i].name,
+        "password": req.body[i].password,
+        "profession": req.body[i].profession,
+        "id": Object.keys(data).length+1 
+      } 
+      data["user" + (Object.keys(data).length+1)] = newUsers[i]
+     }
+     console.log( data );
+     res.end( JSON.stringify(data));
+  });
+})
+
+app.delete('/deleteUser/:id', function (req, res) {
+  // First read existing users.
+  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
+     data = JSON.parse( data );
+      var newUsers = req.body
+      
+    //  for(i in newUsers) {
+    //   data["user" + i] = req.body
+    //  }
+    // data["user" + (Object.keys(data).length+1) ] = req.body
+     console.log( data );
+     res.end( JSON.stringify(data));
+  });
+})
+
+
 const PORT = 8080
 app.listen(PORT, ()=> {
   console.log(`Server listening on ${PORT}`)
