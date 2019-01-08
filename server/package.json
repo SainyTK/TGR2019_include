@@ -1,0 +1,19 @@
+{
+  "name": "tesatopgun_include_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tanakorn0314/TGR2019_include.git"
+  },
+  "author": "kittinan chanpreecha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tanakorn0314/TGR2019_include/issues"
+  },
+  "homepage": "https://github.com/tanakorn0314/TGR2019_include#readme"
+}
