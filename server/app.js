@@ -55,18 +55,12 @@ app.post('/addMultiUser', function (req, res) {
   });
 })
 
-app.delete('/deleteUser/:id', function (req, res) {
-  // First read existing users.
+app.delete('/deleteUser/:id', function(req, res) 
+{
   fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-     data = JSON.parse( data );
-      var newUsers = req.body
-      
-    //  for(i in newUsers) {
-    //   data["user" + i] = req.body
-    //  }
-    // data["user" + (Object.keys(data).length+1) ] = req.body
-     console.log( data );
-     res.end( JSON.stringify(data));
+    data = JSON.parse( data );
+    delete data["user"+ req.params.id]
+    res.end(JSON.stringify(data))
   });
 })
 
