@@ -6,9 +6,9 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
-var option = { "auth": { "user": "tgr","password": "tgr2019" }}
+var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
 
-mongoose.connect('mongodb://localhost/hwData', option, { useNewUrlParser: true })
+mongoose.connect('mongodb://localhost/hwData', option)
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 
