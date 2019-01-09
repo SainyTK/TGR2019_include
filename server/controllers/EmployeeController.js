@@ -22,27 +22,26 @@ employeeController.show = function(req, res) {
       console.log("Error:", err);
     }
     else {
-      res.render("../views/employees/show", {employee: employee});
+      res.send(employee);
     }
   });
 };
 
 // Create new employee
-employeeController.create = function(req, res) {
-  res.render("../views/employees/create");
-};
+// employeeController.create = function(req, res) {
+//   res.send("../views/employees/create");
+// };
 
 // Save new employee
 employeeController.save = function(req, res) {
   var employee = new Employee(req.body);
 
-  employee.save(function(err) {
+  employee.save(function(err,data) {
     if(err) {
       console.log(err);
-      res.render("../views/employees/create");
     } else {
       console.log("Successfully created an employee.");
-      res.redirect("/employees/show/"+employee._id);
+      res.send(data)
     }
   });
 };
@@ -72,13 +71,13 @@ employeeController.update = function(req, res) {
 
 // Delete an employee
 employeeController.delete = function(req, res) {
-  Employee.remove({_id: req.params.id}, function(err) {
+  Employee.remove({_id: req.params.id}, function(err,data) {
     if(err) {
       console.log(err);
     }
     else {
       console.log("Employee deleted!");
-      res.redirect("/employees");
+      res.send(data);
     }
   });
 };
