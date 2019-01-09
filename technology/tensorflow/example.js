@@ -36,45 +36,35 @@ async function prepareData() {
     MAX = -999.0;
     const len = data.length
     for (i = 0; i < len; i++) {
-        if (MAX <= data[i][1]) {
-            MAX = data[i][1];
+        if (MAX <= parseFloat(data[i][1])) {
+            MAX = parseFloat(data[i][1]);
         }
     }
 
-    let dataset = data.map((number) => {
-        return number[1]/MAX;
+    dataset = data.map((number) => {
+        return parseFloat(number[1])/MAX;
     })
 
     const TIME_STEP = 3;
     const NUM_OUT = 0;
 
-    let arr = range(TIME_STEP, dataset.length - NUM_OUT + 1);
+    let arr = range(TIME_STEP, dataset.length - (NUM_OUT + 1));
 
     arr.forEach(function (i) {
         let x = [];
-        // x = [data[i-3][0], data[i-2][0], data[i-1][0]];
-        for(j=i-TIME_STEP; j < i ;j++) {
-            dateMs = Date.parse(data[j][0]);
-            x.push(dateMs);
+        for (let j = i-TIME_STEP ; j < i ; j++) {
+            x.push(dataset[j]);
         }
         xs.push(x);
 
-        let sum = 0;
-        for(let j=i; j>i-TIME_STEP; j--){
-            sum += parseInt(data[j-1][1]);
-        }
-        let avg = sum/TIME_STEP;
-
-        ys.push(avg);
+        ys.push(dataset[i]);
     });
 
-    // console.log(xs);
-    // console.log(ys);
-    // xs = [[10, 20, 30], [20, 30, 40], [30, 40, 50]];
-    // ys = [40, 50, 60];
+    console.log(xs);
+    console.log(ys);
 }
 
-const model = tf.sequential();
+var model = tf.sequential();
 
 //input
 model.add(tf.layers.lstm({
@@ -111,29 +101,35 @@ async function main() {
                 validationSplit: 0.2    // split 20 %, test 80 %
             });
     }
-    // await prepareData();
-    // trainXS = tf.tensor2d(xs);
-    // trainXS = tf.reshape(trainXS, [-1, 3, 1])   //[numofdata, recursive round, dimen of feature of input]   -1 means any
+    await prepareData();
+    trainXS = tf.tensor2d(xs);
+    trainXS = tf.reshape(trainXS, [-1, 3, 1])   //[numofdata, recursive round, dimen of feature of input]   -1 means any
 
-    // trainYS = tf.tensor1d(ys);  //model need 2 
-    // trainYs = tf.reshape(trainYS, [-1, 1])  //[num of result, num if feature output]
+    trainYS = tf.tensor1d(ys);  //model need 2 
+    trainYs = tf.reshape(trainYS, [-1, 1])  //[num of result, num if feature output]
 
     // await trainModel();
     // await model.save('file://model');
 
     const load = async () => {
-        await tf.loadModel('file://model/model.json');
+        model = await tf.loadModel('file://model/model.json');
     };
 
-    load();
+    await load();
 
-    testData = [[Date.parse("Nov 23, 2018"), Date.parse("Nov 25, 2018"), Date.parse("Nov 21, 2018")]];
+    let scaledTestDate = []
+    let arr = range(5, 8);
+    arr.forEach(i => {
+        scaledTestDate.push(dataset[i]);
+    });
+
+    testData = [scaledTestDate];
     testData = tf.tensor2d(testData);
     testData = tf.reshape(testData, [-1, 3, 1]);
 
     const r = model.predict(testData);
     let result = r.dataSync()[0];
-    console.log(result);
+    console.log(result*MAX);
 }
 
 main();
