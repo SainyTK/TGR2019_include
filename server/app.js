@@ -4,6 +4,7 @@ var express = require('express');
 
 var app = express();
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
 
 app.get('/', function(req, res){
   res.send("Hello express!")
@@ -65,7 +66,7 @@ app.delete('/deleteUser/:id', function(req, res)
 })
 
 
-const PORT = 8080
+const PORT = 8000
 app.listen(PORT, ()=> {
   console.log(`Server listening on ${PORT}`)
 })
