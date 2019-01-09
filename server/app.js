@@ -1,83 +1,53 @@
 var express = require('express');
+var path = require('path');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mongojs = require('./db');
+var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 
-var db = mongojs.connect;
+mongoose.connect('mongodb://localhost/hwData')
+  .then(() =>  console.log('connection succesful'))
+  .catch((err) => console.error(err));
+
+var index = require('./routes/index');
+var users = require('./routes/users');
+var temperature = require('./routes/employees');
+
 var app = express();
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/', index);
+app.use('/users', users);
+app.use('/temperature', temperature);
 
-app.get('/', function (req, res) {
-  res.send("Sample Code for RESTful API");
-})
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
 
-//Get all user
-app.get('/showData', function (req, res) {
-  db.temperature.find(function (err, docs) {
-    console.log(docs);
-    res.send(docs);
-  });
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-})
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
 
-//Get user by ID
-app.get('/user/:id', function (req, res) {
-  var id = parseInt(req.params.id);
-
-  db.temperature.findOne({
-    id: id
-  }, function (err, docs) {
-    if (docs != null) {
-      console.log('found', JSON.stringify(docs));
-      res.json(docs);
-    } else {
-      res.send('User not found');
-    }
-  });
-})
-
-//Update user by ID in body
-app.put('/editData/:teamID', function (req, res) {
-  console.log('Get from Api', req.body);
-  db.temperature.findAndModify({
-    query: {
-      teamID: req.params.teamID
-    },
-    update: {
-      $set: req.body
-    }
-  }, function (err, docs) {
-    console.log('Update Done');
-    res.send("update successful");
-  });
-})
-
-//Add user
-app.post('/addData', function (req, res) {
-  var json = req.body;
-  console.log(json)
-  db.temperature.insert(json, function (err, docs) {
-    console.log(docs);
-    res.send(docs);
-  });
-
-
-})
-
-//Delete user by ID
-app.delete('/deleteData/:teamID', function (req, res) {
-  var id = req.params.teamID
-  db.temperature.remove({
-    teamID: id
-  }, function (err, docs) {
-    console.log(docs);
-    res.send(docs);
-  });
-})
-
-var server = app.listen(8080, function () {
-  var port = server.address().port
-
-  console.log("Sample Code for RESTful API run at ", port)
-})
+module.exports = app;
