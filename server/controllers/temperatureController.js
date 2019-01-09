@@ -1,11 +1,11 @@
 var mongoose = require("mongoose");
-var temperature = require("../models/temperature");
+var Temperature = require("../models/temperature");
 
 var temperatureController = {};
 
 // Show list of temperatures
 temperatureController.list = function(req, res) {
-  temperature.find({}).exec(function (err, temperatures) {
+  Temperature.find({}).exec(function (err, temperatures) {
     if (err) {
       console.log("Error:", err);
     }
@@ -17,7 +17,7 @@ temperatureController.list = function(req, res) {
 
 // Show temperature by id
 temperatureController.show = function(req, res) {
-  temperature.findOne({_id: req.params.id}).exec(function (err, temperature) {
+  Temperature.findOne({_id: req.params.id}).exec(function (err, temperature) {
     if (err) {
       console.log("Error:", err);
     }
@@ -34,7 +34,7 @@ temperatureController.show = function(req, res) {
 
 // Save new temperature
 temperatureController.save = function(req, res) {
-  var temperature = new temperature(req.body);
+  var temperature = new Temperature(req.body);
 
   temperature.save(function(err,data) {
     if(err) {
@@ -48,7 +48,7 @@ temperatureController.save = function(req, res) {
 
 // Edit an temperature
 temperatureController.edit = function(req, res) {
-  temperature.findOne({teamID: req.params.teamID}).exec(function (err, temperature) {
+  Temperature.findOne({teamID: req.params.teamID}).exec(function (err, temperature) {
     if (err) {
       console.log("Error:", err);
     }
@@ -60,18 +60,18 @@ temperatureController.edit = function(req, res) {
 
 // Update an temperature
 temperatureController.update = function(req, res) {
-  temperature.findByIdAndUpdate(req.params._id, { $set: { temp: req.body.temp}}, { new: true }, function (err, temperature) {
+  Temperature.findByIdAndUpdate(req.params._id, { $set: { temp: req.body.temp}}, { new: true }, function (err, temperature) {
     if (err) {
       console.log(err);
       res.send("error");
     }
-    res.send(temperature);
+    res.send(Temperature);
   });
 };
 
 // Delete an temperature
 temperatureController.delete = function(req, res) {
-  temperature.remove({_id: req.params.id}, function(err,data) {
+  Temperature.remove({_id: req.params.id}, function(err,data) {
     if(err) {
       console.log(err);
     }
