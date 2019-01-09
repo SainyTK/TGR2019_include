@@ -1,73 +1,83 @@
-var bodyParser = require('body-parser')
-var fs = require('fs')
 var express = require('express');
+var bodyParser = require('body-parser');
+var mongojs = require('./db');
 
+var db = mongojs.connect;
 var app = express();
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 
-app.get('/', function(req, res){
-  res.send("Hello express!")
+
+app.get('/', function (req, res) {
+  res.send("Sample Code for RESTful API");
 })
 
-app.get('/listUsers', (req, res) => {
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-    console.log( data );
-    res.end( data );
- });
+//Get all user
+app.get('/showData', function (req, res) {
+  db.temperature.find(function (err, docs) {
+    console.log(docs);
+    res.send(docs);
+  });
+
 })
 
-app.get('/showbyID/:id', function (req, res) {
-  // First read existing users.
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-    var users = JSON.parse( data );
-    var user = users["user" + req.params.id] 
-    console.log( user );
-    res.end( JSON.stringify(user));
- });
-})
+//Get user by ID
+app.get('/user/:id', function (req, res) {
+  var id = parseInt(req.params.id);
 
-app.post('/addUser', function (req, res) {
-  // First read existing users.
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-     data = JSON.parse( data );
-     data["user" + (Object.keys(data).length+1) ] = req.body;
-     console.log( data );
-     res.end( JSON.stringify(data));
+  db.temperature.findOne({
+    id: id
+  }, function (err, docs) {
+    if (docs != null) {
+      console.log('found', JSON.stringify(docs));
+      res.json(docs);
+    } else {
+      res.send('User not found');
+    }
   });
 })
 
-app.post('/addMultiUser', function (req, res) {
-  // First read existing users.
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-     data = JSON.parse( data );
-      var newUsers = req.body
-     for(i in newUsers) {
-      newUsers[i] = {
-        "name": req.body[i].name,
-        "password": req.body[i].password,
-        "profession": req.body[i].profession,
-        "id": Object.keys(data).length+1 
-      } 
-      data["user" + (Object.keys(data).length+1)] = newUsers[i]
-     }
-     console.log( data );
-     res.end( JSON.stringify(data));
+//Update user by ID in body
+app.put('/editData/:teamID', function (req, res) {
+  console.log('Get from Api', req.body);
+  db.temperature.findAndModify({
+    query: {
+      teamID: req.params.teamID
+    },
+    update: {
+      $set: req.body
+    }
+  }, function (err, docs) {
+    console.log('Update Done');
+    res.send("update successful");
   });
 })
 
-app.delete('/deleteUser/:id', function(req, res) 
-{
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-    data = JSON.parse( data );
-    delete data["user"+ req.params.id]
-    res.end(JSON.stringify(data))
+//Add user
+app.post('/addData', function (req, res) {
+  var json = req.body;
+  console.log(json)
+  db.temperature.insert(json, function (err, docs) {
+    console.log(docs);
+    res.send(docs);
+  });
+
+
+})
+
+//Delete user by ID
+app.delete('/deleteData/:teamID', function (req, res) {
+  var id = req.params.teamID
+  db.temperature.remove({
+    teamID: id
+  }, function (err, docs) {
+    console.log(docs);
+    res.send(docs);
   });
 })
 
+var server = app.listen(8080, function () {
+  var port = server.address().port
 
-const PORT = 8000
-app.listen(PORT, ()=> {
-  console.log(`Server listening on ${PORT}`)
+  console.log("Sample Code for RESTful API run at ", port)
 })
-
