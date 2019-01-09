@@ -1,40 +1,36 @@
 var express = require('express');
 var router = express.Router();
-var employee = require("../controllers/EmployeeController.js");
+var temperature = require("../controllers/temperatureController.js");
 
-// Get all employees
+// Get all temperatures
 router.get('/showData', function(req, res) {
-  employee.list(req, res);
+  temperature.list(req, res);
 });
 
-// Get single employee by id
+// Get single temperature by id
 router.get('/show/:id', function(req, res) {
-  employee.show(req, res);
+  temperature.show(req, res);
 });
 
-// Create employee
-router.get('/create', function(req, res) {
-  employee.create(req, res);
-});
 
-// Save employee
+// Save temperature
 router.post('/addData', function(req, res) {
-  employee.save(req, res);
+  temperature.save(req, res);
 });
 
-// Edit employee
+// Edit temperature
 router.get('/edit/:teamID', function(req, res) {
-  employee.edit(req, res);
+  temperature.edit(req, res);
 });
 
 // Edit update
 router.put('/editData/:teamID', function(req, res) {
-  employee.update(req, res);
+  temperature.update(req, res);
 });
 
 // Edit update
 router.delete('/delete/:teamID', function(req, res, next) {
-  employee.delete(req, res);
+  temperature.delete(req, res);
 });
 
 module.exports = router;
