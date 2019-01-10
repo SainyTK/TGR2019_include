@@ -2,13 +2,19 @@ const bodyParser = require('body-parser')
 const request = require('request')
 const express = require('express')
 
+const beaconController = require('./beacon/beaconController');
+const dateFormat = require('./date-format');
+const api = require('./api');
+
 const app = express()
 const port = process.env.PORT || 4000
 const hostname = '127.0.0.1'
 const HEADERS = {
 	'Content-Type': 'application/json',
-	'Authorization': 'Bearer XON7QlNjk1l+UyceSLLWPg1I4jH5P4H8osOfNeFpNbb71DskFeG8H5afCxV5H39ZDOBTTCud4lbWtXlXL9N9+YYtrbNP4S9trnZhnt+WXinr1i70GE+f/svs/uDdQHUaTv+KrWbiIRS30brc60va4gdB04t89/1O/w1cDnyilFU='
+	'Authorization': 'Bearer bV3o8L3VmlQ2XxIMT3b3lZMPE1mw56VUqFxAuKX8tGgxnTGxrNgD+RftUZlXdAYYKNaOfo9LxuBX2DlyjDfPwiN5rTFfNf5x+kFyX8W0XSdvRfG8TqlV72KBRxsOAICXX7ngjbDh36mUo2qgog73wQdB04t89/1O/w1cDnyilFU='
 }
+
+console.log(dateFormat.parse(new Date()));
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -23,16 +29,55 @@ app.get('/webhook', (req, res) => {
 
 // Reply
 app.post('/webhook', (req, res) => {
-	// reply block
-	let reply_token = req.body.events[0].replyToken
-	//let msg = req.body.events[0].message.text
-	reply(reply_token, JSON.stringify(req.body))
+    // reply block
+    let event = req.body.events[0];
+    let reply_token = event.replyToken
+
+    if (event.type == 'message') {
+        let message = event.message;
+
+        if (message == 'Admin_Mon') {
+            
+        }
+    }
+    else if (event.type == 'beacon') {
+        let beacon = event.beacon;
+
+        let beaconTO = JSON.stringify({
+            beacon: {
+                dateTime: dateFormat.parse(new Date()),
+                status: beacon.type
+            } 
+        })
+
+        console.log(beaconTO)
+        api.pushBeacon(beaconTO)
+
+        reply(reply_token, 'สวัสดี เราเอง')
+
+        switch (beacon.type) {
+            case 'enter' :
+                beaconController.increasePIn((pCurrent) => {
+                    console.log(pCurrent)
+                    // push('จำนวนคนเกิน กรุญาเชิญคนออกจากบริเวณ')
+                    reply(reply_token, 'จำนวนคนเกิน กรุญาเชิญคนออกจากบริเวณ')
+                });
+                break;
+            case 'leave' :
+                beaconController.increasePOut((pCurrent) => {
+                    console.log(pCurrent)
+                    // push('จำนวนคนเกิน กรุญาเชิญคนออกจากบริเวณ')
+                    reply(reply_token, 'จำนวนคนเกิน กรุญาเชิญคนออกจากบริเวณ')
+                });
+                break;
+        }
+    }
 })
 
 function push(msg) {
 	let body = JSON.stringify({
 	// push body
-	to: 'U1e299ffc15a5ec93f55c919d5ba1360b',
+	to: 'Uab960a72ea0f65c6509ab7ea2fc86398',
 	messages: [
 		{
 			type: 'text',
