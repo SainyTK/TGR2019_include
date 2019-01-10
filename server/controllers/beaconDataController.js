@@ -10,7 +10,6 @@ beaconDataController.list = function(req, res) {
     }
     else {
       res.send(beaconDatas);
-      console.log(beaconDatas)
     }
   });
 };
@@ -29,17 +28,18 @@ beaconDataController.show = function(req, res) {
 
 // Save new beaconData
 beaconDataController.save = function(req, res) {
-  var data = {
-      "dataTime": req.body.beacon.dataTime,
-      "status": req.body.beacon.status
-  }  
+var data = {
+    dateTime: req.body.beacon.dateTime.toString(),
+    status: req.body.beacon.status.toString()
+}
+
   var beaconData = new BeaconData(data);
 
   beaconData.save(function(err,data) {
     if(err) {
       console.log(err);
     } else {
-      console.log(data);
+      console.log("Successfully created an beaconData.");
       res.send(data)
     }
   });
