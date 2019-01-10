@@ -2,7 +2,7 @@ const tf = require('@tensorflow/tfjs');
 var csv = require("fast-csv");
 require('@tensorflow/tfjs-node');
 
-const TRAIN_ROUND = 1;
+const TRAIN_ROUND = 5;
 const LEARNING_RATE = 0.001;
 const TIME_STEP = 1;
 const NUM_OUT = 0;
@@ -13,19 +13,35 @@ var ys = [];
 var dataset = [];
 var MAX = -999;
 
+var modelAvailable = false;
+
 //prepare data
 async function prepareData() {
-    let data = await readCSV();
 
-    const len = data.length;
+    modelAvailable = false;
+
+    let data = await readCSV();
+    let numVisitor = [];
+
+    data = data.slice(1, data.length);
+
+    data.forEach((row) => {
+        let rowArr = row[0].split(';');
+        for (let i = 1; i < rowArr.length; i++) {
+            numVisitor.push(parseInt(rowArr[i]));
+        }
+    })
+
+    const len = numVisitor.length;
+
     for (i = 0; i < len; i++) {
-        if (MAX <= parseFloat(data[i][1])) {
-            MAX = parseFloat(data[i][1]);
+        if (MAX <= numVisitor[i]) {
+            MAX = numVisitor[i];
         }
     }
 
-    dataset = data.map((number) => {
-        return parseFloat(number[1])/MAX;
+    dataset = numVisitor.map((number) => {
+        return number/MAX;
     })
 
     let arr = range(TIME_STEP, dataset.length - (NUM_OUT + 1));
@@ -94,6 +110,8 @@ async function saveModel() {
 //load
 async function loadModel() {
     model = await tf.loadModel('file://model/model.json');
+
+    modelAvailable = true;
 }
 
 //create test set
@@ -104,23 +122,49 @@ function createTestData(start) {
         testData.push(dataset[i]);
     });
 
-    testData = [testData];
-    testData = tf.tensor2d(testData);
-    testData = tf.reshape(testData, [-1, TIME_STEP, 1]);
     return testData;
+}
+
+function toTensor(dSet) {
+    dSet = [dSet];
+    dSet = tf.tensor2d(dSet);
+    dSet = tf.reshape(dSet, [-1, TIME_STEP, 1]);
+    return dSet;
 }
 
 //predict
 function predict(input) {
+    if(!modelAvailable)
+        return -1;
     const r = model.predict(input);
     let result = r.dataSync()[0] * MAX;
     return result;
 }
 
+function predictN(input, numNext) {
+    if(!modelAvailable)
+        return -1;
+    let res = [];
+    for (let i=0; i<numNext; i++) {
+        let predRes = predict(toTensor(input));
+
+        input = input.slice(1, input.length);
+        input.push(res/MAX);
+
+        res.push(Math.round(predRes));
+        console.log(`ผู้เข้าชมในอีก ${i+1} ชั่วโมง ประมาณ ${predRes} คน`);
+    }
+
+    let result = {
+        number_of_tourist: res
+    }
+    return result;
+}
+
 //test model
-function testModel(start = 0) {
+function testModel(start, numNext) {
     let testSet = createTestData(start);
-    return predict(testSet);
+    return predictN(testSet, numNext);
 }
 
 function scaleData(dataset) {
@@ -139,7 +183,7 @@ function readCSV() {
     let data = [];
     return new Promise(function (resolve, reject) {
         csv
-            .fromPath("./data/THB.csv")
+            .fromPath("./data/sanam.csv")
             .on("data", function (str) {
                 data.push(str);
             })
@@ -152,15 +196,13 @@ function readCSV() {
 async function init() {
     await prepareData();
     createModel();
-    await trainModel();
-    await saveModel();
+    // await trainModel();
+    // await saveModel();
     await loadModel();
 }
 
-async function main() {
-    await init();
-    
-    console.log(testModel(0));
+module.exports = {
+    init,
+    predict,
+    testModel
 }
-
-main();

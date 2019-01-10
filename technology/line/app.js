@@ -6,6 +6,8 @@ const beaconController = require('./beacon/beaconController');
 const dateFormat = require('./date-format');
 const api = require('./api');
 
+const tensorflow = require('../tensorflow');
+
 const app = express()
 const port = process.env.PORT || 4000
 const hostname = '127.0.0.1'
@@ -14,10 +16,24 @@ const HEADERS = {
 	'Authorization': 'Bearer bV3o8L3VmlQ2XxIMT3b3lZMPE1mw56VUqFxAuKX8tGgxnTGxrNgD+RftUZlXdAYYKNaOfo9LxuBX2DlyjDfPwiN5rTFfNf5x+kFyX8W0XSdvRfG8TqlV72KBRxsOAICXX7ngjbDh36mUo2qgog73wQdB04t89/1O/w1cDnyilFU='
 }
 
-console.log(dateFormat.parse(new Date()));
+tensorflow.init();
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+app.get('/predict?', (req, res) => {
+    const START_TEST_SET = 0;
+    const PREDICT_NEXT = req.query.n;
+
+    let result = tensorflow.testModel(START_TEST_SET, PREDICT_NEXT);
+    if(result == -1) {
+        console.log(`ยังไม่มีโมเดล`)
+        res.send(`ยังไม่มีโมเดล`)
+        return;
+    }
+    
+    res.json(result);
+})
 
 // Push
 app.get('/webhook', (req, res) => {
@@ -37,7 +53,7 @@ app.post('/webhook', (req, res) => {
         let message = event.message;
 
         if (message == 'Admin_Mon') {
-            
+
         }
     }
     else if (event.type == 'beacon') {
