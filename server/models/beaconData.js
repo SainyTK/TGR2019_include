@@ -1,9 +1,8 @@
 var mongoose = require('mongoose');
 
 var BeaconDataSchema = new mongoose.Schema({
-  Pin: Number,
-  Pout: Number,
-  timestamp: Date
+  dateTime: String,
+  status: String
 }, {
   versionKey: false // You should be aware of the outcome after set to false
 });

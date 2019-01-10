@@ -4,6 +4,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var http = require('http')
 mongoose.Promise = global.Promise;
 
 //var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
@@ -43,5 +44,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-var port = 8000
+var port = 80
 app.listen(port, console.log(`Server listening on ${ port }`))

@@ -10,6 +10,7 @@ beaconDataController.list = function(req, res) {
     }
     else {
       res.send(beaconDatas);
+      console.log(beaconDatas)
     }
   });
 };
@@ -38,7 +39,7 @@ beaconDataController.save = function(req, res) {
     if(err) {
       console.log(err);
     } else {
-      console.log("Successfully created an beaconData.");
+      console.log(data);
       res.send(data)
     }
   });
