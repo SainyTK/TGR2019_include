@@ -6,7 +6,6 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
-
 mongoose.connect('mongodb://localhost/hwData')
 
   .then(() =>  console.log('connection succesful'))
@@ -24,7 +23,6 @@ app.use(cookieParser());
 
 
 app.use('/temperature', temperature);
-
 
 
 // catch 404 and forward to error handler
@@ -45,4 +43,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+app.listen(8000, console.log("Server running on port 8000"))
