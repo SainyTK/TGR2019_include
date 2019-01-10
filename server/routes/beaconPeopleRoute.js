@@ -10,7 +10,7 @@ router.get('/getSanam?', function(req, res) {
   beaconPeople.getSanam(req, res);
 });
 
-router.post('/addPeople', function(req, res) {
+router.post('/putPInOut', function(req, res) {
   beaconPeople.addPeople(req, res);
 });
 

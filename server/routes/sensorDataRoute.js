@@ -6,6 +6,10 @@ router.get('/', (req,res) => {
   res.send('Hello')
 })
 // Get all sensorDatas
+router.get('/getAllData', function(req, res) {
+  sensorData.getAllData(req, res);
+});
+// Get all sensorDatas
 router.get('/showSensorData', function(req, res) {
   sensorData.list(req, res);
 });
