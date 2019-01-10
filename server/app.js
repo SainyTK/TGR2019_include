@@ -1,73 +1,48 @@
-var bodyParser = require('body-parser')
-var fs = require('fs')
 var express = require('express');
+var path = require('path');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+
+var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
+
+mongoose.connect('mongodb://localhost/hwData', option)
+  .then(() =>  console.log('connection succesful'))
+  .catch((err) => console.error(err));
+
+
+var temperature = require('./routes/temperature');
 
 var app = express();
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
 
-app.get('/', function(req, res){
-  res.send("Hello express!")
-})
-
-app.get('/listUsers', (req, res) => {
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-    console.log( data );
-    res.end( data );
- });
-})
-
-app.get('/showbyID/:id', function (req, res) {
-  // First read existing users.
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-    var users = JSON.parse( data );
-    var user = users["user" + req.params.id] 
-    console.log( user );
-    res.end( JSON.stringify(user));
- });
-})
-
-app.post('/addUser', function (req, res) {
-  // First read existing users.
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-     data = JSON.parse( data );
-     data["user" + (Object.keys(data).length+1) ] = req.body;
-     console.log( data );
-     res.end( JSON.stringify(data));
-  });
-})
-
-app.post('/addMultiUser', function (req, res) {
-  // First read existing users.
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-     data = JSON.parse( data );
-      var newUsers = req.body
-     for(i in newUsers) {
-      newUsers[i] = {
-        "name": req.body[i].name,
-        "password": req.body[i].password,
-        "profession": req.body[i].profession,
-        "id": Object.keys(data).length+1 
-      } 
-      data["user" + (Object.keys(data).length+1)] = newUsers[i]
-     }
-     console.log( data );
-     res.end( JSON.stringify(data));
-  });
-})
-
-app.delete('/deleteUser/:id', function(req, res) 
-{
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-    data = JSON.parse( data );
-    delete data["user"+ req.params.id]
-    res.end(JSON.stringify(data))
-  });
-})
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 
-const PORT = 8000
-app.listen(PORT, ()=> {
-  console.log(`Server listening on ${PORT}`)
-})
+app.use('/temperature', temperature);
 
+
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+module.exports = app;
