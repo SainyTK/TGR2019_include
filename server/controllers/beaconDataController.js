@@ -3,7 +3,7 @@ var BeaconData = require("../models/beaconData");
 var beaconDataController = {};
 
 // Show list of beaconDatas
-beaconDataController.list = function(req, res) {
+beaconDataController.monitor = function(req, res) {
   BeaconData.find({}).exec(function (err, beaconDatas) {
     if (err) {
       console.log("Error:", err);
@@ -14,25 +14,13 @@ beaconDataController.list = function(req, res) {
   });
 };
 
-// Show beaconData by id
-beaconDataController.show = function(req, res) {
-  BeaconData.findOne({_id: req.params.id}).exec(function (err, beaconData) {
-    if (err) {
-      console.log("Error:", err);
-    }
-    else {
-      res.send(beaconData);
-    }
-  });
-};
-
 // Save new beaconData
 beaconDataController.save = function(req, res) {
 var data = {
     dateTime: req.body.beacon.dateTime.toString(),
     status: req.body.beacon.status.toString()
 }
-
+console.log(req.body.beacon.dateTime)
   var beaconData = new BeaconData(data);
 
   beaconData.save(function(err,data) {

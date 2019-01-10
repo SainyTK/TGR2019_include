@@ -4,11 +4,31 @@ var sensorDataController = {};
 
 // Show list of sensorDatas
 sensorDataController.list = function(req, res) {
-  SensorData.find({}).exec(function (err, sensorDatas) {
+  SensorData.find({}).sort({_id:-1}).exec(function (err, sensorDatas) {
     if (err) {
       console.log("Error:", err);
     }
     else {
+      function addZero(i) {
+        if (i < 10) {
+          i = "0" + i;
+        }
+        return i;
+      }
+      // var date = new Date()
+      // var dateNow = date.toLocaleTimeString()
+      // var dateBefore = addZero(date.getHours()-1) + ":" + addZero(date.getMinutes()) + ":" + addZero(date.getSeconds())
+      // for(i in sensorDatas) {
+      //   console.log(sensorDatas[i].date)
+      // }
+      var date = new Date()
+      var dateNow = date.toLocaleString()
+      var dateBefore = addZero(date.getHours()-1) + ":" + addZero(date.getMinutes()) + ":" + addZero(date.getSeconds())
+      var timestampNow = Date.parse(dateNow)
+      var timestampbefore = Date.parse(dateBefore)
+      console.log(dateNow,dateBefore,timestampNow,timestampbefore)
+      let Pin = 0
+      let Pout = 0
       res.send(sensorDatas);
     }
   });
