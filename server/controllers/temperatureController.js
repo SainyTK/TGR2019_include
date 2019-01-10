@@ -27,11 +27,6 @@ temperatureController.show = function(req, res) {
   });
 };
 
-// Create new temperature
-// temperatureController.create = function(req, res) {
-//   res.send("../views/temperatures/create");
-// };
-
 // Save new temperature
 temperatureController.save = function(req, res) {
   var temperature = new Temperature(req.body);
