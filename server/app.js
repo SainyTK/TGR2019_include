@@ -2,9 +2,13 @@ var bodyParser = require('body-parser')
 var fs = require('fs')
 var express = require('express');
 
+var webhook = require('./routes/webhook');
+
 var app = express();
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+
+app.use(webhook);
 
 app.get('/', function(req, res){
   res.send("Hello express!")
