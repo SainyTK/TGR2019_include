@@ -58,13 +58,13 @@ app.post('/webhook', (req, res) => {
 
         if (message == 'Admin_Mon') {
             api.getMonitor().then((res) => {
-                let { Temperature, Humidity, Pin, Pout } = res;
-                console.log(Temperature);
-                let replyMsg = `รายงานสถานะปัจจุบัน \n
-                                อุณหภูมิ = ${Temperature}
-                                ความชื้น = ${Humidity}
-                                จำนวนคนเข้า = ${Pin}
-                                จำนวนคนออก = ${Pout}`
+                let result = JSON.parse(res);
+                console.log(result)
+                let replyMsg = `รายงานสถานะปัจจุบัน
+                                อุณหภูมิ = ${result.Temperature} C
+                                ความชื้น = ${result.Humidity} %
+                                จำนวนคนเข้า = ${result.Pin} คน
+                                จำนวนคนออก = ${result.Pout} คน`
                 reply(reply_token, replyMsg);
             }).catch((err) => {
                 console.log(err)
@@ -98,11 +98,26 @@ app.post('/webhook', (req, res) => {
                 beaconController.increasePOut(beaconCallback);
                 break;
         }
+
+        postPInOut();
     }
 })
 
-beaconCallback = (pCurrent) => {
-    console.log(pCurrent)
+postPInOut = () => {
+    let now = new Date();
+    let dateNow = new Date(now.getTime() - now.getTimezoneOffset() * (60000));
+
+    let inOutTO = JSON.stringify({
+        pIn: beaconController.getPIn(),
+        pOut: beaconController.getPOut(),
+        date: dateNow
+    })
+
+    console.log(inOutTO)
+    api.putPInOut(inOutTO)
+}
+
+beaconCallback = () => {
     beaconController.currentUsers.forEach((id) => push('จำนวนคนเกิน กรุญาเชิญคนออกจากบริเวณ', id))
 }
 

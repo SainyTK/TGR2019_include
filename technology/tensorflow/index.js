@@ -202,8 +202,8 @@ function readCSV() {
 async function init() {
     await prepareData();
     createModel();
-    await trainModel();
-    await saveModel();
+    // await trainModel();
+    // await saveModel();
     await loadModel();
 }
 

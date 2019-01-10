@@ -1,9 +1,10 @@
 var BeaconData = require("../models/beaconData");
+var file = require('../utils/fileUtils');
 
 var beaconDataController = {};
 
 // Show list of beaconDatas
-beaconDataController.monitor = function(req, res) {
+beaconDataController.monitor = async function(req, res) {
   BeaconData.find({}).exec(function (err, beaconDatas) {
     if (err) {
       console.log("Error:", err);
@@ -20,7 +21,7 @@ var data = {
     dateTime: req.body.beacon.dateTime.toString(),
     status: req.body.beacon.status.toString()
 }
-console.log(req.body.beacon.dateTime)
+  console.log(req.body.beacon.dateTime)
   var beaconData = new BeaconData(data);
 
   beaconData.save(function(err,data) {

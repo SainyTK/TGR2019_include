@@ -2,24 +2,18 @@ const request = require('request');
 const apiServer = 'http://202.139.192.105:80';
 const apiLocal = 'http://192.168.71.33:80';
 
-const api = apiLocal;
+const api = apiServer;
 
 const HEADER = {
     'Content-Type': 'application/json',
 }
 
+function putPInOut(data) {
+    curl('putPInOut', data)
+}
+
 function pushBeacon(data) {
-    request.post({
-        url: `${api}/putSanam`,
-        body: data,
-        headers: HEADER
-    }, (err, res, body) => {
-        if (err) {
-            console.log(err)
-            return;
-        }
-        console.log('Post Success')
-    })
+    curl('putSanam', data)
 }
 
 function getMonitor() {
@@ -35,7 +29,21 @@ function getMonitor() {
     })
 }
 
+function curl(method, data) {
+    request.post({
+        url: `${api}/${method}`,
+        body: data,
+        headers: HEADER
+    }, (err, res, body) => {
+        if (err) {
+            console.log(err)
+            return;
+        }
+    })
+}
+
 module.exports = {
+    putPInOut,
     pushBeacon,
     getMonitor
 }
