@@ -4,12 +4,12 @@ var beaconPeopleController = {};
 
 // Show list of BeaconPeoples
 beaconPeopleController.getAllPeople = function(req, res) {
-  BeaconPeople.find({}).exec(function (err, beaconPeoples) {
+  BeaconPeople.find({}).exec(function (err, beaconPeople) {
     if (err) {
       console.log("Error:", err);
     }
     else {
-      res.send(beaconPeoples);
+      res.send(beaconPeople);
     }
   });
 };
