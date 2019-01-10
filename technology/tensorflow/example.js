@@ -113,8 +113,8 @@ function createTestData(start) {
 //predict
 function predict(input) {
     const r = model.predict(input);
-    let result = r.dataSync()[0];
-    console.log(result * MAX);
+    let result = r.dataSync()[0] * MAX;
+    return result;
 }
 
 //test model
@@ -160,7 +160,7 @@ async function init() {
 async function main() {
     await init();
     
-    testModel(0);
+    console.log(testModel(0));
 }
 
 main();
