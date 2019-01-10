@@ -2,9 +2,9 @@ const tf = require('@tensorflow/tfjs');
 var csv = require("fast-csv");
 require('@tensorflow/tfjs-node');
 
-const TRAIN_ROUND = 5;
+const TRAIN_ROUND = 10;
 const LEARNING_RATE = 0.001;
-const TIME_STEP = 1;
+const TIME_STEP = 3;
 const NUM_OUT = 0;
 
 var model;
@@ -15,22 +15,28 @@ var MAX = -999;
 
 var modelAvailable = false;
 
-//prepare data
-async function prepareData() {
-
-    modelAvailable = false;
-
+async function dataFromFile() {
     let data = await readCSV();
-    let numVisitor = [];
+    let d = [];
 
     data = data.slice(1, data.length);
 
     data.forEach((row) => {
         let rowArr = row[0].split(';');
         for (let i = 1; i < rowArr.length; i++) {
-            numVisitor.push(parseInt(rowArr[i]));
+            d.push(parseInt(rowArr[i]));
         }
     })
+
+    return d;
+}
+
+//prepare data
+async function prepareData() {
+
+    modelAvailable = false;
+
+    let numVisitor = await dataFromFile();
 
     const len = numVisitor.length;
 
@@ -196,8 +202,8 @@ function readCSV() {
 async function init() {
     await prepareData();
     createModel();
-    // await trainModel();
-    // await saveModel();
+    await trainModel();
+    await saveModel();
     await loadModel();
 }
 
