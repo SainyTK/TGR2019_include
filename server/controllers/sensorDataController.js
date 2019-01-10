@@ -2,34 +2,39 @@ var SensorData = require("../models/sensorData");
 
 var sensorDataController = {};
 
-// Show list of sensorDatas
-sensorDataController.list = function(req, res) {
-  SensorData.find({}).sort({_id:-1}).exec(function (err, sensorDatas) {
+sensorDataController.getAllData = function(req, res) {
+  SensorData.find({}).exec(function (err, SensorData) {
     if (err) {
       console.log("Error:", err);
     }
     else {
-      function addZero(i) {
-        if (i < 10) {
-          i = "0" + i;
-        }
-        return i;
-      }
-      // var date = new Date()
-      // var dateNow = date.toLocaleTimeString()
-      // var dateBefore = addZero(date.getHours()-1) + ":" + addZero(date.getMinutes()) + ":" + addZero(date.getSeconds())
-      // for(i in sensorDatas) {
-      //   console.log(sensorDatas[i].date)
-      // }
-      var date = new Date()
-      var dateNow = date.toLocaleString()
-      var dateBefore = addZero(date.getHours()-1) + ":" + addZero(date.getMinutes()) + ":" + addZero(date.getSeconds())
-      var timestampNow = Date.parse(dateNow)
-      var timestampbefore = Date.parse(dateBefore)
-      console.log(dateNow,dateBefore,timestampNow,timestampbefore)
+      res.send(SensorData);
+    }
+  });
+};
+
+// Show list of sensorDatas
+sensorDataController.list = function(req, res) {
+      var now = new Date()
+      var dateNow = new Date(now.getTime() - now.getTimezoneOffset() * (60000))
+      var dateBefore = new Date(now.getTime() - now.getTimezoneOffset() * (51428))
+  SensorData.find({ date: { $gte: dateBefore, $lt: dateNow } }).sort({_id:-1}).exec(function (err, sensorData) {
+    if (err) {
+      console.log("Error:", err);
+    }
+    else {
       let Pin = 0
       let Pout = 0
-      res.send(sensorDatas);
+      for(i in sensorData) {
+        Pin = Pin + sensorData[i].Pin
+        Pout = Pout + sensorData[i].Pout
+      }
+      res.send({ 
+        "Temperature": sensorData[0].Temperature,
+        "Humidity": sensorData[0].Humidity,
+        "Pin": Pin,
+        "Pout": Pout
+      });
     }
   });
 };
