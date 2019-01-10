@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
+
 var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
 
 mongoose.connect('mongodb://localhost/hwData', option)
@@ -28,7 +29,6 @@ app.use('/temperature', temperature);
 app.use(webhook);
 
 
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -47,4 +47,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+app.listen(8000, console.log("Server running on port 8000"))
