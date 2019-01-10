@@ -1,6 +1,8 @@
 const request = require('request');
-const api = 'http://202.139.192.105:80';
+const apiServer = 'http://202.139.192.105:80';
 const apiLocal = 'http://192.168.71.33:80';
+
+const api = apiLocal;
 
 const HEADER = {
     'Content-Type': 'application/json',
@@ -8,11 +10,11 @@ const HEADER = {
 
 function pushBeacon(data) {
     request.post({
-        url: `${api}/beaconData/addData`,
+        url: `${api}/putSanam`,
         body: data,
         headers: HEADER
     }, (err, res, body) => {
-        if(err) {
+        if (err) {
             console.log(err)
             return;
         }
@@ -21,19 +23,19 @@ function pushBeacon(data) {
 }
 
 function getMonitor() {
-    request.get({
-        url: `${api}/beaconData/addData`,
-        body: data,
-        headers: HEADER
-    }, (err, res, body) => {
-        if(err) {
-            console.log(err)
-            return;
-        }
-        console.log('Post Success')
+    return new Promise((resolve, reject) => {
+        request.get({
+            url: `${api}/showSensorData`,
+            headers: HEADER
+        }, (err, res, body) => {
+            console.log(res.body)
+            if (err) reject
+            resolve(res.body)
+        })
     })
 }
 
 module.exports = {
-    pushBeacon: pushBeacon
+    pushBeacon,
+    getMonitor
 }

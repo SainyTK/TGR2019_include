@@ -2,6 +2,8 @@ var pIn = 0;
 var pOut = 0;
 var pCurrent = 0;
 
+let currentUsers = []
+
 const PEOPLE_THRESHOLD = 2;
 
 function increasePIn(callback = undefined) {
@@ -20,7 +22,18 @@ function increasePOut(callback = undefined) {
         callback(pCurrent);
 }
 
+function addUser(userId) {
+    currentUsers.push(userId);
+}
+
+function removeUser(userId) {
+    currentUsers = currentUsers.filter((item) => item != userId)
+}
+
 module.exports = {
-    increasePIn: increasePIn,
-    increasePOut: increasePOut
+    increasePIn,
+    increasePOut,
+    addUser,
+    removeUser,
+    currentUsers
 }
