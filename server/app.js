@@ -7,16 +7,14 @@ var mongoose = require('mongoose');
 var http = require('http')
 mongoose.Promise = global.Promise;
 
-
 var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
 
-mongoose.connect('mongodb://localhost/hwData', option)
+mongoose.connect('mongodb://localhost/serverDatabase', option)
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 
-
-var temperature = require('./routes/temperature');
-var webhook = require('./routes/webhook');
+var sensorData = require('./routes/sensorData');
+var beaconData = require('./routes/beaconDataRoute');
 
 var app = express();
 
@@ -25,10 +23,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-
-app.use('/temperature', temperature);
-app.use(webhook);
-
+app.use('/sensorData', sensorData);
+app.use('/beaconData', beaconData);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -48,4 +44,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-http.createServer(app).listen(80, console.log("Server running on port 80"))
+var port = 80
+app.listen(port, console.log(`Server listening on ${ port }`))

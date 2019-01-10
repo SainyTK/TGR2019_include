@@ -1,36 +1,39 @@
 var express = require('express');
 var router = express.Router();
-var temperature = require("../controllers/temperatureController.js");
+var sensorData = require("../controllers/sensorDataController.js");
 
-// Get all temperatures
+router.get('/', (req,res) => {
+  res.send('Hello')
+})
+// Get all sensorDatas
 router.get('/showData', function(req, res) {
-  temperature.list(req, res);
+  sensorData.list(req, res);
 });
 
-// Get single temperature by id
+// Get single sensorData by id
 router.get('/show/:id', function(req, res) {
-  temperature.show(req, res);
+  sensorData.show(req, res);
 });
 
 
-// Save temperature
+// Save sensorData
 router.post('/addData', function(req, res) {
-  temperature.save(req, res);
+  sensorData.save(req, res);
 });
 
-// Edit temperature
+// Edit sensorData
 router.get('/edit/:teamID', function(req, res) {
-  temperature.edit(req, res);
+  sensorData.edit(req, res);
 });
 
 // Edit update
 router.put('/editData/:teamID', function(req, res) {
-  temperature.update(req, res);
+  sensorData.update(req, res);
 });
 
 // Edit update
 router.delete('/delete/:teamID', function(req, res, next) {
-  temperature.delete(req, res);
+  sensorData.delete(req, res);
 });
 
 module.exports = router;
