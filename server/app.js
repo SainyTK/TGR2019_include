@@ -4,16 +4,18 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var http = require('http')
 mongoose.Promise = global.Promise;
 
-var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
+//var options = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
 
-mongoose.connect('mongodb://localhost/hwData', option)
+mongoose.connect('mongodb://localhost/serverDatabase')
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 
-
-var temperature = require('./routes/temperature');
+var sensorData = require('./routes/sensorDataRoute');
+var beaconData = require('./routes/beaconDataRoute');
+var beaconPeople = require('./routes/beaconPeopleRoute');
 
 var app = express();
 
@@ -22,7 +24,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/temperature', temperature);
+app.use(sensorData);
+app.use(beaconData);
+app.use(beaconPeople);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -42,4 +46,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(8000, console.log("Server running on port 8000"))
+var port = 80
+app.listen(port, console.log(`Server listening on ${ port }`))
