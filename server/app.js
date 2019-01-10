@@ -6,9 +6,9 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
-var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
+//var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
 
-mongoose.connect('mongodb://localhost/serverDatabase', option)
+mongoose.connect('mongodb://localhost/serverDatabase', options)
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 
@@ -24,7 +24,6 @@ app.use(cookieParser());
 
 app.use('/sensorData', sensorData);
 app.use('/beaconData', beaconData);
-app.use(webhook);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

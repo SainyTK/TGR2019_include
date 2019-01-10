@@ -28,7 +28,11 @@ beaconDataController.show = function(req, res) {
 
 // Save new beaconData
 beaconDataController.save = function(req, res) {
-  var beaconData = new BeaconData(req.body);
+  var data = {
+      "dataTime": req.body.beacon.dataTime,
+      "status": req.body.beacon.status
+  }  
+  var beaconData = new BeaconData(data);
 
   beaconData.save(function(err,data) {
     if(err) {
