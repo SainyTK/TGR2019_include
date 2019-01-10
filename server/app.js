@@ -4,6 +4,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var http = require('http')
 mongoose.Promise = global.Promise;
 
 
@@ -47,4 +48,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(8000, console.log("Server running on port 8000"))
+http.createServer(app).listen(80, console.log("Server running on port 80"))
