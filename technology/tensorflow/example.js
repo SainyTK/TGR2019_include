@@ -1,11 +1,131 @@
 const tf = require('@tensorflow/tfjs');
+var csv = require("fast-csv");
 require('@tensorflow/tfjs-node');
 
-var csv = require("fast-csv");
+const TRAIN_ROUND = 1;
+const LEARNING_RATE = 0.001;
+const TIME_STEP = 1;
+const NUM_OUT = 0;
+
+var model;
 var xs = [];
 var ys = [];
+var dataset = [];
+var MAX = -999;
 
-var data = [];
+//prepare data
+async function prepareData() {
+    let data = await readCSV();
+
+    const len = data.length;
+    for (i = 0; i < len; i++) {
+        if (MAX <= parseFloat(data[i][1])) {
+            MAX = parseFloat(data[i][1]);
+        }
+    }
+
+    dataset = data.map((number) => {
+        return parseFloat(number[1])/MAX;
+    })
+
+    let arr = range(TIME_STEP, dataset.length - (NUM_OUT + 1));
+
+    arr.forEach(function (i) {
+        let x = [];
+        for (let j = i - TIME_STEP; j < i; j++) {
+            x.push(dataset[j]);
+        }
+        xs.push(x);
+
+        ys.push(dataset[i]);
+    });
+}
+
+//create model
+function createModel() {
+    model = tf.sequential();
+    //input
+
+    model.add(tf.layers.lstm({
+        units: 10,  // 50 node if more will slower
+        inputShape: [TIME_STEP, 1], // input 3 time steps each time step 1 dimension  e.g. [10,20,30]
+        returnSequences: false
+    }));
+
+    //output
+    model.add(tf.layers.dense({
+        units: 1,   // 1 output
+        kernelInitializer: 'VarianceScaling',
+        activation: 'relu'
+    }));
+
+    const optimizer = tf.train.adam(LEARNING_RATE);
+
+    model.compile({
+        optimizer: optimizer,
+        loss: 'meanSquaredError',
+        metrics: ['accuracy'],
+    });
+}
+
+//train model
+async function trainModel() {
+    trainXS = tf.tensor2d(xs);
+    trainXS = tf.reshape(trainXS, [-1, TIME_STEP, 1])   //[numofdata, recursive round, dimen of feature of input]   -1 means any
+
+    trainYS = tf.tensor1d(ys);  //model need 2 
+    trainYs = tf.reshape(trainYS, [-1, 1])  //[num of result, num if feature output]
+    await model.fit(
+        trainXS,
+        trainYS,
+        {
+            batchSize: 1,   //bunch of data
+            epochs: TRAIN_ROUND,     //round of training
+            shuffle: true,      //random select data 
+            validationSplit: 0.2    // split 20 %, test 80 %
+        });
+}
+
+//save
+async function saveModel() {
+    await model.save('file://model');
+}
+
+//load
+async function loadModel() {
+    model = await tf.loadModel('file://model/model.json');
+}
+
+//create test set
+function createTestData(start) {
+    let testData = []
+    let arr = range(start, start + TIME_STEP);
+    arr.forEach(i => {
+        testData.push(dataset[i]);
+    });
+
+    testData = [testData];
+    testData = tf.tensor2d(testData);
+    testData = tf.reshape(testData, [-1, TIME_STEP, 1]);
+    return testData;
+}
+
+//predict
+function predict(input) {
+    const r = model.predict(input);
+    let result = r.dataSync()[0];
+    console.log(result * MAX);
+}
+
+//test model
+function testModel(start = 0) {
+    let testSet = createTestData(start);
+    return predict(testSet);
+}
+
+function scaleData(dataset) {
+    return dataset.map((data) => parseFloat(data)/MAX);
+}
 
 function range(start, end) {
     var ans = [];
@@ -16,6 +136,7 @@ function range(start, end) {
 }
 
 function readCSV() {
+    let data = [];
     return new Promise(function (resolve, reject) {
         csv
             .fromPath("./data/THB.csv")
@@ -28,108 +149,18 @@ function readCSV() {
     });
 }
 
-
-async function prepareData() {
-
-    await readCSV();
-
-    MAX = -999.0;
-    const len = data.length
-    for (i = 0; i < len; i++) {
-        if (MAX <= parseFloat(data[i][1])) {
-            MAX = parseFloat(data[i][1]);
-        }
-    }
-
-    dataset = data.map((number) => {
-        return parseFloat(number[1])/MAX;
-    })
-
-    const TIME_STEP = 3;
-    const NUM_OUT = 0;
-
-    let arr = range(TIME_STEP, dataset.length - (NUM_OUT + 1));
-
-    arr.forEach(function (i) {
-        let x = [];
-        for (let j = i-TIME_STEP ; j < i ; j++) {
-            x.push(dataset[j]);
-        }
-        xs.push(x);
-
-        ys.push(dataset[i]);
-    });
-
-    console.log(xs);
-    console.log(ys);
+async function init() {
+    await prepareData();
+    createModel();
+    await trainModel();
+    await saveModel();
+    await loadModel();
 }
 
-var model = tf.sequential();
-
-//input
-model.add(tf.layers.lstm({
-    units: 10,  // 50 node if more will slower
-    inputShape: [3, 1], // input 3 time steps each time step 1 dimension  e.g. [10,20,30]
-    returnSequences: false
-}));
-
-//output
-model.add(tf.layers.dense({
-    units: 1,   // 1 output
-    kernelInitializer: 'VarianceScaling',
-    activation: 'relu'
-}));
-
-const LEARNING_RATE = 0.001;
-const optimizer = tf.train.adam(LEARNING_RATE);
-
-model.compile({
-    optimizer: optimizer,
-    loss: 'meanSquaredError',
-    metrics: ['accuracy'],
-});
-
 async function main() {
-    async function trainModel() {
-        const history = await model.fit(
-            trainXS,
-            trainYS,
-            {
-                batchSize: 1,   //bunch of data
-                epochs: 10,     //round of training
-                shuffle: true,      //random select data 
-                validationSplit: 0.2    // split 20 %, test 80 %
-            });
-    }
-    await prepareData();
-    trainXS = tf.tensor2d(xs);
-    trainXS = tf.reshape(trainXS, [-1, 3, 1])   //[numofdata, recursive round, dimen of feature of input]   -1 means any
-
-    trainYS = tf.tensor1d(ys);  //model need 2 
-    trainYs = tf.reshape(trainYS, [-1, 1])  //[num of result, num if feature output]
-
-    // await trainModel();
-    // await model.save('file://model');
-
-    const load = async () => {
-        model = await tf.loadModel('file://model/model.json');
-    };
-
-    await load();
-
-    let scaledTestDate = []
-    let arr = range(5, 8);
-    arr.forEach(i => {
-        scaledTestDate.push(dataset[i]);
-    });
-
-    testData = [scaledTestDate];
-    testData = tf.tensor2d(testData);
-    testData = tf.reshape(testData, [-1, 3, 1]);
-
-    const r = model.predict(testData);
-    let result = r.dataSync()[0];
-    console.log(result*MAX);
+    await init();
+    
+    testModel(0);
 }
 
 main();
