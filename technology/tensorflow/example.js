@@ -1,10 +1,12 @@
 const tf = require('@tensorflow/tfjs');
 require('@tensorflow/tfjs-node');
 
-//var csv = require("fast-csv");
+var csv = require("fast-csv");
 var xs = [];
 var ys = [];
-/*
+
+var data = [];
+
 function range(start, end) {
     var ans = [];
     for (let i = start; i < end; i++) {
@@ -14,61 +16,72 @@ function range(start, end) {
 }
 
 function readCSV() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         csv
-        .fromPath(file_name) 
-        .on("data", function(str){    
-        })
-        .on("end", function(){
-        
-        console.log(data.length);
-        resolve(data);
-        });
+            .fromPath("./data/THB.csv")
+            .on("data", function (str) {
+                data.push(str);
+            })
+            .on("end", function () {
+                resolve(data);
+            });
     });
 }
-*/
+
 
 async function prepareData() {
-    /*
-    MAX = -999;
+
+    await readCSV();
+
+    MAX = -999.0;
     const len = data.length
-    for (i=0; i<len; i++) {
-        if (MAX <= data[i]) {
-            MAX = data[i];
+    for (i = 0; i < len; i++) {
+        if (MAX <= parseFloat(data[i][1])) {
+            MAX = parseFloat(data[i][1]);
         }
     }
-    
-    let dataset = data.map((number) => {
-        return number/MAX;
+
+    dataset = data.map((number) => {
+        return parseFloat(number[1])/MAX;
     })
 
-    let arr = range(TIME_STEP, dataset.length - NUM_OUT + 1);
+    const TIME_STEP = 3;
+    const NUM_OUT = 0;
 
-    arr.forEach(function(i) {
-        
+    let arr = range(TIME_STEP, dataset.length - (NUM_OUT + 1));
+
+    arr.forEach(function (i) {
+        let x = [];
+        for (let j = i-TIME_STEP ; j < i ; j++) {
+            x.push(dataset[j]);
+        }
+        xs.push(x);
+
+        ys.push(dataset[i]);
     });
-    */
-   xs = [[10,20,30],[20,30,40], ,[30,40,50]];
-   ys = [40,50,60];
-    
+
+    console.log(xs);
+    console.log(ys);
 }
 
-const model = tf.sequential();
+var model = tf.sequential();
 
-model.add(tf.layers.xxx({
-    units: xxx,
-    inputShape: [xxx],
-    returnSequences: xxx
+//input
+model.add(tf.layers.lstm({
+    units: 10,  // 50 node if more will slower
+    inputShape: [3, 1], // input 3 time steps each time step 1 dimension  e.g. [10,20,30]
+    returnSequences: false
 }));
 
-model.add(tf.layers.xxx({
-    units: xxx,
+//output
+model.add(tf.layers.dense({
+    units: 1,   // 1 output
     kernelInitializer: 'VarianceScaling',
-    activation: 'xxx'
+    activation: 'relu'
 }));
 
-const LEARNING_RATE = xxx;
-const optimizer = tf.train.xxx(LEARNING_RATE);
+const LEARNING_RATE = 0.001;
+const optimizer = tf.train.adam(LEARNING_RATE);
 
 model.compile({
     optimizer: optimizer,
@@ -76,33 +89,47 @@ model.compile({
     metrics: ['accuracy'],
 });
 
-async function main(){
-	async function trainModel(){
+async function main() {
+    async function trainModel() {
         const history = await model.fit(
             trainXS,
             trainYS,
             {
-                batchSize: xxx,
-                epochs: xxx,
-                shuffle:xxx,
-                validationSplit: xxx
+                batchSize: 1,   //bunch of data
+                epochs: 10,     //round of training
+                shuffle: true,      //random select data 
+                validationSplit: 0.2    // split 20 %, test 80 %
             });
     }
     await prepareData();
-    
-    
-	await trainModel();
-    const saveResult = await model.save('file://xxx');
-    
-    const load = async () => {
-        const model = await tf.loadModel('file://xxx');
-      };
-      
-    load();
+    trainXS = tf.tensor2d(xs);
+    trainXS = tf.reshape(trainXS, [-1, 3, 1])   //[numofdata, recursive round, dimen of feature of input]   -1 means any
 
-    const r = model.predict(xxx);
+    trainYS = tf.tensor1d(ys);  //model need 2 
+    trainYs = tf.reshape(trainYS, [-1, 1])  //[num of result, num if feature output]
+
+    // await trainModel();
+    // await model.save('file://model');
+
+    const load = async () => {
+        model = await tf.loadModel('file://model/model.json');
+    };
+
+    await load();
+
+    let scaledTestDate = []
+    let arr = range(5, 8);
+    arr.forEach(i => {
+        scaledTestDate.push(dataset[i]);
+    });
+
+    testData = [scaledTestDate];
+    testData = tf.tensor2d(testData);
+    testData = tf.reshape(testData, [-1, 3, 1]);
+
+    const r = model.predict(testData);
     let result = r.dataSync()[0];
-    console.log(result);
+    console.log(result*MAX);
 }
 
 main();

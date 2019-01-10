@@ -15,6 +15,8 @@ mongoose.connect('mongodb://localhost/hwData', option)
 
 var temperature = require('./routes/temperature');
 
+var webhook = require('./routes/webhook');
+
 var app = express();
 
 app.use(logger('dev'));
