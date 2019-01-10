@@ -9,12 +9,13 @@ mongoose.Promise = global.Promise;
 
 var option = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
 
-mongoose.connect('mongodb://localhost/hwData', option)
+mongoose.connect('mongodb://localhost/serverDatabase', option)
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 
 
-var temperature = require('./routes/temperature');
+var sensorData = require('./routes/sensorData');
+var beaconData = require('./routes/beaconDataRoute');
 var webhook = require('./routes/webhook');
 
 var app = express();
@@ -25,7 +26,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
-app.use('/temperature', temperature);
+app.use('/sensorData', sensorData);
+app.use('/beaconData', beaconData);
 app.use(webhook);
 
 
@@ -47,4 +49,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(8000, console.log("Server running on port 8000"))
+var port = 8000
+app.listen(port, console.log(`Server listening on ${ port }`))
