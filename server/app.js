@@ -9,13 +9,14 @@ mongoose.Promise = global.Promise;
 
 var options = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
 
-mongoose.connect('mongodb://localhost/serverDatabase', options)
+mongoose.connect('mongodb://localhost/serverDatabase')
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 
 var sensorData = require('./routes/sensorDataRoute');
 var beaconData = require('./routes/beaconDataRoute');
 var beaconPeople = require('./routes/beaconPeopleRoute');
+var visitorData = require('./routes/visitorDataRoute');
 
 var app = express();
 
@@ -27,6 +28,7 @@ app.use(cookieParser());
 app.use(sensorData);
 app.use(beaconData);
 app.use(beaconPeople);
+app.use(visitorData);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

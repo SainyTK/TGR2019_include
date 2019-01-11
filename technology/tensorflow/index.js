@@ -1,5 +1,6 @@
 const tf = require('@tensorflow/tfjs');
 var csv = require("fast-csv");
+var api = require('../line/api');
 require('@tensorflow/tfjs-node');
 
 const TRAIN_ROUND = 10;
@@ -31,12 +32,25 @@ async function dataFromFile() {
     return d;
 }
 
+async function dataFromAPI() {
+    let res = await api.getSanam(8000);
+    res = JSON.parse(res);
+    let d = [];
+    let data = res.number_of_tourist;
+
+    data.forEach((item) => {
+        d.push(parseInt(item));
+    })
+
+    return d;
+}
+
 //prepare data
 async function prepareData() {
 
     modelAvailable = false;
 
-    let numVisitor = await dataFromFile();
+    let numVisitor = await dataFromAPI();
 
     const len = numVisitor.length;
 
@@ -202,8 +216,8 @@ function readCSV() {
 async function init() {
     await prepareData();
     createModel();
-    // await trainModel();
-    // await saveModel();
+    await trainModel();
+    await saveModel();
     await loadModel();
 }
 
