@@ -64,8 +64,8 @@ sensorDataController.save = function(req, res) {
   var payload = req.body.DevEUI_uplink.payload_hex
   //var payload = "03670110056700FF"
   console.log(payload.slice(2, 4))
-console.log(payload.slice(4,5))
-console.log(payload.slice(5,8))
+  console.log(payload.slice(4,5))
+  console.log(payload.slice(5,8))
 if(payload) {
     if( payload.slice(2, 4) === "67" ) {
       if(payload.slice(4,5) === '0') {
@@ -90,16 +90,20 @@ if(payload) {
         console.log("It is not a humidity")
       }
   }
-  // var sensorData = new SensorData(req.body);
+    var data = {
+      "Temperature": Temperature,
+      "Humidity": Humidity
+    }
+  var sensorData = new SensorData(data);
 
-  // sensorData.save(function(err,data) {
-  //   if(err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log("Successfully created an sensorData.");
-  //     res.send(data)
-  //   }
-  // });
+  sensorData.save(function(err,data) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log("Successfully created an sensorData.");
+      res.send(data)
+    }
+  });
   console.log(payload)
 };
 

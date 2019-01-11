@@ -14,12 +14,12 @@ if(payload) {
     } else {
       console.log("It is not a temperature")
     }
-    if( payload.slice(2, 4) === "67" ) {
-        if(payload.slice(4,5) === '0') {
-          var Humidity = (parseInt(payload.slice(5,8), 16))/10
+    if( payload.slice(10, 12) === "68" ) {
+        if(payload.slice(12,13) === '0') {
+          var Humidity = (parseInt(payload.slice(13,16), 16))/10
           console.log(Humidity)
-        } else if(payload.slice(4,5) === 'f') {
-          var Humidity = -((parseInt(payload.slice(5,8), 16))/10)
+        } else if(payload.slice(12,13) === 'f') {
+          var Humidity = -((parseInt(payload.slice(13,16), 16))/10)
           console.log(Humidity)
         }
       } else {
