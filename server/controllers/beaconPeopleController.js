@@ -1,16 +1,7 @@
 var BeaconPeople = require("../models/beaconPeople");
-var BeaconData = require('../models/beaconData');
 var file = require('../utils/fileUtils');
 
 var beaconPeopleController = {};
-
-fetchBeaconStatus();
-
-function fetchBeaconStatus() {
-  BeaconData.find({}).exec(function (err, beaconData) {
-    console.log(beaconData);
-  })
-}
 
 // Show list of BeaconPeoples
 beaconPeopleController.getAllPeople = function(req, res) {
@@ -26,10 +17,10 @@ beaconPeopleController.getAllPeople = function(req, res) {
 
 // Show BeaconPeople by id
 beaconPeopleController.getSanam = async function (req, res) {
-  let data = await file.extractData()
+  // let data = await file.extractData()
 
-  console.log(data);
-  res.json(data);
+  // console.log(data);
+  // res.json(data);
 
   // BeaconPeople.find({}).sort({_id:-1}).limit(parseInt(req.query.hours)).exec(function (err, beaconPeople) {
   // //BeaconPeople.find({ hours: req.query.hours }).exec(function (err, beaconPeople) {

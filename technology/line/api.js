@@ -1,8 +1,9 @@
 const request = require('request');
 const apiServer = 'http://202.139.192.105:80';
 const apiLocal = 'http://192.168.71.33:80';
+const local = 'http://localhost:80'
 
-const api = apiServer;
+const api = local;
 
 const HEADER = {
     'Content-Type': 'application/json',
@@ -29,6 +30,19 @@ function getMonitor() {
     })
 }
 
+function getSanam(hours) {
+    return new Promise((resolve, reject) => {
+        request.get({
+            url: `${api}/getSanam?${hours}`,
+            headers: HEADER
+        }, (err, res, body) => {
+            console.log(res.body)
+            if (err) reject
+            resolve(res.body)
+        })
+    })
+}
+
 function curl(method, data) {
     request.post({
         url: `${api}/${method}`,
@@ -45,5 +59,6 @@ function curl(method, data) {
 module.exports = {
     putPInOut,
     pushBeacon,
-    getMonitor
+    getMonitor,
+    getSanam
 }

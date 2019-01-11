@@ -7,4 +7,4 @@ var VisitorDataScheme = new mongoose.Schema({
   versionKey: false // You should be aware of the outcome after set to false
 });
 
-module.exports = mongoose.model('visitorData', SensorDataSchema);
+module.exports = mongoose.model('visitorData', VisitorDataScheme);

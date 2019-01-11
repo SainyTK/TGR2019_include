@@ -4,7 +4,7 @@ var file = require('../utils/fileUtils');
 var beaconDataController = {};
 
 // Show list of beaconDatas
-beaconDataController.monitor = async function(req, res) {
+beaconDataController.monitor = function(req, res) {
   BeaconData.find({}).exec(function (err, beaconDatas) {
     if (err) {
       console.log("Error:", err);
