@@ -6,9 +6,9 @@ router.get('/getAllPeople', function(req, res) {
   beaconPeople.getAllPeople(req, res);
 });
 
-router.get('/getSanam?', function(req, res) {
-  beaconPeople.getSanam(req, res);
-});
+// router.get('/getSanam?', function(req, res) {
+//   beaconPeople.getSanam(req, res);
+// });
 
 router.post('/putPInOut', function(req, res) {
   beaconPeople.addPeople(req, res);
