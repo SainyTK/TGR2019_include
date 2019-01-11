@@ -61,17 +61,34 @@ sensorDataController.show = function(req, res) {
 
 // Save new sensorData
 sensorDataController.save = function(req, res) {
-  var payload = req.body.Dev.EUI_uplink.payload_hex
+  var payload = req.body.DevEUI_uplink.payload_hex
   //var payload = "03670110056700FF"
-  if(payload) {
-    if( payload.slice(3, 4) === "67" ) {
+  console.log(payload.slice(2, 4))
+console.log(payload.slice(4,5))
+console.log(payload.slice(5,8))
+if(payload) {
+    if( payload.slice(2, 4) === "67" ) {
       if(payload.slice(4,5) === '0') {
-        var Temperature = parseInt(payload.slice(5,7), 16)
+        var Temperature = (parseInt(payload.slice(5,8), 16))/10
+        console.log(Temperature)
+      } else if(payload.slice(4,5) === 'f') {
+        var Temperature = -((parseInt(payload.slice(5,8), 16))/10)
         console.log(Temperature)
       }
     } else {
       console.log("It is not a temperature")
     }
+    if( payload.slice(2, 4) === "67" ) {
+        if(payload.slice(4,5) === '0') {
+          var Humidity = (parseInt(payload.slice(5,8), 16))/10
+          console.log(Humidity)
+        } else if(payload.slice(4,5) === 'f') {
+          var Humidity = -((parseInt(payload.slice(5,8), 16))/10)
+          console.log(Humidity)
+        }
+      } else {
+        console.log("It is not a humidity")
+      }
   }
   // var sensorData = new SensorData(req.body);
 
