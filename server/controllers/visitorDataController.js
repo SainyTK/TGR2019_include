@@ -1,4 +1,4 @@
-var VisitorData = require("../models/visitorData");
+var VisitorData = require("../models/VisitorData");
 var BeaconData = require('../models/beaconData')
 var file = require('../utils/fileUtils');
 

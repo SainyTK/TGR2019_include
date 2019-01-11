@@ -7,9 +7,9 @@ var mongoose = require('mongoose');
 var http = require('http')
 mongoose.Promise = global.Promise;
 
-var options = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
+//var options = { "auth": { "user": "tgr","password": "tgr2019" }, useNewUrlParser: true }
 
-mongoose.connect('mongodb://localhost/serverDatabase', options)
+mongoose.connect('mongodb://localhost/serverDatabase')
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 

@@ -29,13 +29,18 @@ sensorDataController.list = function(req, res) {
         Pin = Pin + sensorData[i].Pin
         Pout = Pout + sensorData[i].Pout
       }
-      res.send({ 
-        "Temperature": sensorData[0].Temperature,
-        "Humidity": sensorData[0].Humidity,
-        "Pin": Pin,
-        "Pout": Pout
-      });
     }
+  });
+  SensorData.find({}).sort({_id:-1}).exec(function (err, sensorData) {
+    if (err) {
+      console.log("Error:", err);
+    }
+    res.send({ 
+      "Temperature": sensorData[0].Temperature,
+      "Humidity": sensorData[0].Humidity,
+      "Pin": Pin,
+      "Pout": Pout
+    });
   });
 };
 
