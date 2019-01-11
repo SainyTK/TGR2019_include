@@ -5,7 +5,7 @@ var SensorDataSchema = new mongoose.Schema({
   Humidity: Number,
   Pin: Number,
   Pout: Number,
-  date: Date
+  date: { type: Date, default: Date.now }
 }, {
   versionKey: false // You should be aware of the outcome after set to false
 });

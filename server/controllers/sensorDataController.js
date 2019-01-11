@@ -53,16 +53,29 @@ sensorDataController.show = function(req, res) {
 
 // Save new sensorData
 sensorDataController.save = function(req, res) {
-  var sensorData = new SensorData(req.body);
-
-  sensorData.save(function(err,data) {
-    if(err) {
-      console.log(err);
+  var payload = req.body.Dev.EUI_uplink.payload_hex
+  //var payload = "03670110056700FF"
+  if(payload) {
+    if( payload.slice(3, 4) === "67" ) {
+      if(payload.slice(4,5) === '0') {
+        var Temperature = parseInt(payload.slice(5,7), 16)
+        console.log(Temperature)
+      }
     } else {
-      console.log("Successfully created an sensorData.");
-      res.send(data)
+      console.log("It is not a temperature")
     }
-  });
+  }
+  // var sensorData = new SensorData(req.body);
+
+  // sensorData.save(function(err,data) {
+  //   if(err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log("Successfully created an sensorData.");
+  //     res.send(data)
+  //   }
+  // });
+  console.log(payload)
 };
 
 // Edit an sensorData
